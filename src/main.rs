@@ -1,7 +1,7 @@
-use std::net::UdpSocket;
+use std::{io::Bytes, net::UdpSocket};
 
 #[derive(Debug)]
-struct DNSHeader {
+struct DnsHeader {
     id: u16,
     qr: u8,
     op_code: u8,
@@ -17,11 +17,13 @@ struct DNSHeader {
     arcount: u16,
 }
 
-impl DNSHeader {
-    pub fn new(buffer: &mut [u8]) -> DNSHeader {
+impl DnsHeader {
+    pub fn new(buffer: &mut [u8]) -> DnsHeader {
         let id = ((buffer[0] as u16) << 8) | (buffer[1] as u16);
 
-        DNSHeader {
+        // TODO: parse the remaining fields
+
+        DnsHeader {
             id,
             qr: 1 << 7,
             op_code: 0,
@@ -59,16 +61,67 @@ impl DNSHeader {
     }
 }
 
+// impl From<&str> for &[u8] {
+//     fn from(domain: &str) -> Self {
+
+//     }
+// }
+
+#[derive(Debug)]
+struct DnsQuestion {
+    name: String,
+    r#type: u16,
+    class: u16,
+}
+
+impl DnsQuestion {
+    pub fn new(buffer: &mut [u8]) -> DnsQuestion {
+        let mut name = String::new();
+        let r#type = 0;
+        let class = 0;
+
+        let index = buffer.iter().position(|&x| x == b'\x00').unwrap();
+        // let size_of_content = buffer[0];
+
+        name = String::from_utf8(buffer[1..index].to_vec()).unwrap();
+
+        println!("NAME: {:?}", name);
+
+        DnsQuestion {
+            name,
+            r#type,
+            class,
+        }
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = Vec::new();
+
+        bytes
+    }
+}
+
 #[derive(Debug)]
 struct DNSMessage {
-    pub header: DNSHeader,
+    pub header: DnsHeader,
+    pub question: DnsQuestion,
 }
 
 impl DNSMessage {
     pub fn new(buffer: &mut [u8]) -> DNSMessage {
-        let header = DNSHeader::new(&mut buffer[..12]);
+        let header = DnsHeader::new(&mut buffer[..12]);
+        let question = DnsQuestion::new(&mut buffer[12..]);
 
-        DNSMessage { header }
+        DNSMessage { header, question }
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut bytes = Vec::new();
+
+        bytes.extend(self.header.to_bytes());
+        bytes.extend(self.question.to_bytes());
+
+        bytes
     }
 }
 
@@ -81,7 +134,7 @@ fn main() {
             Ok((_, source)) => {
                 let dns_message = DNSMessage::new(&mut buf);
 
-                let msg = &&dns_message.header.to_bytes();
+                let msg = &dns_message.to_bytes();
 
                 udp_socket
                     .send_to(msg, source)
