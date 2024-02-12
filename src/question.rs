@@ -23,8 +23,6 @@ impl DnsQuestion {
         let r#type = buffer[current_index + 2] as u16;
         let class = buffer[current_index + 2] as u16;
 
-        println!("name: {:?}", name);
-
         DnsQuestion {
             name,
             r#type,

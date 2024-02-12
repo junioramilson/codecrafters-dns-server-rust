@@ -1,7 +1,9 @@
 use std::net::UdpSocket;
+mod answer;
 mod header;
 mod message;
 mod question;
+
 use crate::message::DNSMessage;
 
 fn main() {
