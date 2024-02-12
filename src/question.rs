@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub struct DnsQuestion {
     pub name: String,
-    pub r#type: u8,
-    pub class: u8,
+    pub r#type: u16,
+    pub class: u16,
 }
 
 impl DnsQuestion {
@@ -20,8 +20,8 @@ impl DnsQuestion {
         }
 
         let name = String::from_utf8(buffer[0..end_of_labels_index + 1].to_vec()).unwrap();
-        let r#type = buffer[current_index + 2] as u8;
-        let class = buffer[current_index + 2] as u8;
+        let r#type = buffer[current_index + 2] as u16;
+        let class = buffer[current_index + 2] as u16;
 
         println!("name: {:?}", name);
 
@@ -35,9 +35,9 @@ impl DnsQuestion {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
 
-        bytes.extend(self.name.as_bytes());
-        bytes.extend(self.r#type.to_be_bytes());
-        bytes.extend(self.class.to_be_bytes());
+        bytes.extend_from_slice(&self.name.as_bytes());
+        bytes.extend_from_slice(&self.r#type.to_be_bytes());
+        bytes.extend_from_slice(&self.class.to_be_bytes());
 
         bytes
     }

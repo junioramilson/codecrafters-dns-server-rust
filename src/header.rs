@@ -38,15 +38,13 @@ impl DnsHeader {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
 
+        let byte: u8 =
+            ((self.qr << 7) | (self.op_code << 6) | (self.aa << 2) | (self.tc << 1) | self.rd);
+        let rest: u8 = (self.ra << 7) | (self.z << 6) | (self.rcode << 3);
+
         bytes.extend(self.id.to_be_bytes());
-        bytes.push(self.qr);
-        bytes.extend(self.op_code.to_be_bytes());
-        bytes.extend(self.aa.to_be_bytes());
-        bytes.extend(self.tc.to_be_bytes());
-        bytes.extend(self.rd.to_be_bytes());
-        bytes.extend(self.ra.to_be_bytes());
-        bytes.extend(self.z.to_be_bytes());
-        bytes.extend(self.rcode.to_be_bytes());
+        bytes.push(byte);
+        bytes.push(rest);
         bytes.extend(self.qdcount.to_be_bytes());
         bytes.extend(self.ancount.to_be_bytes());
         bytes.extend(self.nscount.to_be_bytes());

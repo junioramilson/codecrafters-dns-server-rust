@@ -20,8 +20,8 @@ impl DNSMessage {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
 
-        bytes.extend(self.header.to_bytes());
-        bytes.extend(self.question.to_bytes());
+        bytes.extend_from_slice(&self.header.to_bytes());
+        bytes.extend_from_slice(&self.question.to_bytes());
 
         bytes
     }
