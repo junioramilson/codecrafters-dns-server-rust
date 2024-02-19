@@ -17,17 +17,21 @@ pub struct DnsHeader {
 
 impl DnsHeader {
     pub fn new(buffer: &mut [u8]) -> DnsHeader {
-        let id = ((buffer[0] as u16) << 8) | (buffer[1] as u16);
+        let id = ((buffer[0] as u16) << 8) | (buffer[1] as u16); // 0 and 1 = ID
+        let op_code = (buffer[2] & (((1 << 4) - 1) << 3)) >> 3;
+        let rd = buffer[2] & 1;
+        let rcode = if op_code == 0 { 0 } else { 4 };
+
         DnsHeader {
             id,
             qr: 1,
-            op_code: 0,
+            op_code,
             aa: 0,
             tc: 0,
-            rd: 0,
+            rd,
             ra: 0,
             z: 0,
-            rcode: 0,
+            rcode,
             qdcount: 1,
             ancount: 1,
             nscount: 0,
@@ -37,10 +41,9 @@ impl DnsHeader {
 
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::new();
-
         let byte: u8 =
-            (self.qr << 7) | (self.op_code << 6) | (self.aa << 2) | (self.tc << 1) | self.rd;
-        let rest: u8 = (self.ra << 7) | (self.z << 6) | (self.rcode << 3);
+            (self.qr << 7) | (self.op_code << 3) | (self.aa << 2) | (self.tc << 1) | self.rd;
+        let rest: u8 = (self.ra << 7) | (self.z << 6) | (self.rcode);
 
         bytes.extend(self.id.to_be_bytes());
         bytes.push(byte);
