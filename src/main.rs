@@ -17,6 +17,8 @@ fn main() {
 
                 let msg = &dns_message.to_bytes();
 
+                println!("Dispatching message...");
+
                 udp_socket
                     .send_to(msg, source)
                     .expect("Failed to send response");

@@ -39,7 +39,7 @@ impl DnsHeader {
         let mut bytes = Vec::new();
 
         let byte: u8 =
-            ((self.qr << 7) | (self.op_code << 6) | (self.aa << 2) | (self.tc << 1) | self.rd);
+            (self.qr << 7) | (self.op_code << 6) | (self.aa << 2) | (self.tc << 1) | self.rd;
         let rest: u8 = (self.ra << 7) | (self.z << 6) | (self.rcode << 3);
 
         bytes.extend(self.id.to_be_bytes());
@@ -49,6 +49,8 @@ impl DnsHeader {
         bytes.extend(self.ancount.to_be_bytes());
         bytes.extend(self.nscount.to_be_bytes());
         bytes.extend(self.arcount.to_be_bytes());
+
+        println!("Headers length: {}", bytes.len());
 
         bytes
     }
