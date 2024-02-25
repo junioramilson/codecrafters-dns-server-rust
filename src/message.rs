@@ -46,7 +46,8 @@ impl DNSMessage {
             }
 
             let label_len = buffer[curr_index_label_len] as usize;
-            let label_content = &buffer[curr_index_label_len + 1..label_len + curr_index_label_len];
+            let label_content =
+                &buffer[curr_index_label_len + 1..label_len + curr_index_label_len + 1];
 
             name.push((label_len - 1) as u8);
             name.extend_from_slice(label_content);
