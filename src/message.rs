@@ -35,41 +35,27 @@ impl DNSMessage {
 
     fn parse_questions(&self, buffer: &mut [u8]) -> Vec<DnsQuestion> {
         let mut questions = Vec::<DnsQuestion>::new();
-
-        println!("Buffer: {:?}", String::from_utf8(buffer.to_vec()));
-
         let mut name = Vec::<u8>::new();
         let mut curr_index_label_len = 0;
+
         loop {
-            if buffer[curr_index_label_len] == 0 {
+            if buffer[curr_index_label_len] == b'\x00' {
                 break;
             }
 
-            let label_len = buffer[curr_index_label_len] as usize;
-            let label_content =
-                &buffer[curr_index_label_len + 1..label_len + curr_index_label_len + 1];
+            let label_len = buffer[curr_index_label_len];
 
-            name.push((label_len - 1) as u8);
+            println!("label_len: {label_len}");
+            let label_content = &buffer[curr_index_label_len + 1
+                ..(label_len as usize + curr_index_label_len as usize + 1)];
+
+            name.push(label_len);
             name.extend_from_slice(label_content);
 
-            curr_index_label_len = curr_index_label_len + label_len + 1;
+            curr_index_label_len = curr_index_label_len + label_len as usize + 1;
         }
 
         name.push(0);
-
-        // let label_len_index = 0;
-
-        // let label_1_len = buffer[label_len_index] as usize + 1;
-        // let label_1 = &buffer[label_len_index + 1..label_1_len];
-        // let label_2_len = buffer[label_1_len] as usize;
-        // let label_2 = &buffer[(label_1_len + 1)..(label_1_len + label_2_len + 1) as usize];
-
-        // let mut name = Vec::<u8>::new();
-        // name.push((label_1_len - 1) as u8);
-        // name.extend_from_slice(label_1);
-        // name.push(label_2_len as u8);
-        // name.extend_from_slice(label_2);
-        // name.push(0);
 
         questions.push(DnsQuestion {
             name,
