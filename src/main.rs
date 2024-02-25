@@ -13,7 +13,8 @@ fn main() {
     loop {
         match udp_socket.recv_from(&mut buf) {
             Ok((_, source)) => {
-                let dns_message = DNSMessage::new(&mut buf);
+                let dns_message = DNSMessage::new();
+                let dns_message = dns_message.parse(&mut buf);
 
                 let msg = &dns_message.to_bytes();
 

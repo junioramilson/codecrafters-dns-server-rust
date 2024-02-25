@@ -17,7 +17,7 @@ pub struct DnsHeader {
 
 impl DnsHeader {
     pub fn new(buffer: &mut [u8]) -> DnsHeader {
-        let id = ((buffer[0] as u16) << 8) | (buffer[1] as u16); // 0 and 1 = ID
+        let id = ((buffer[0] as u16) << 8) | (buffer[1] as u16);
         let op_code = (buffer[2] & (((1 << 4) - 1) << 3)) >> 3;
         let rd = buffer[2] & 1;
         let rcode = if op_code == 0 { 0 } else { 4 };
