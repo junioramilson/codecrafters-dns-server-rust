@@ -190,5 +190,8 @@ mod tests {
         ];
         let dns_message = DNSMessage::new();
         let dns_message = dns_message.parse(&mut buf);
+
+        assert_eq!(dns_message.questions.len(), 2);
+        assert_eq!(dns_message.answers.len(), 2);
     }
 }
